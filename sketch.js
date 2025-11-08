@@ -132,7 +132,6 @@ function drawTooltip(h) {
     `${h.name} (${h.country})`,
     `Elevation: ${!isNaN(h.el) ? h.el + " m" : "N/A"}`,
     `Type: ${h.type}`,
-    `Category: ${h.typeCat}`,
     `Status: ${h.status}`,
     `Last eruption: ${h.erupt}`
   ];
