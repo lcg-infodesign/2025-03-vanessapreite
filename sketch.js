@@ -38,6 +38,15 @@ function draw() {
   background(210, 10, 10);
   hovered = null;
 
+  // --- TITOLO ---
+  push();
+  fill(255);
+  textSize(32);
+  textAlign(CENTER, TOP);
+  textStyle(BOLD);
+  text("Volcanoes of the World", width / 2, 20); // centrato in alto
+  pop();
+
   let n = data.getRowCount();
   let gridCols = 40;
   let gridRows = 25;
@@ -170,14 +179,17 @@ function drawTooltip(h) {
   pop();
 }
 
-// Legenda + checkbox in basso, separati come flex
+// Legenda + checkbox in riga, tick centrato dentro
 function drawLegendAndCheckboxes(yBase) {
   let spacing = 20;
 
-  // ---- AREA LEGENDA ELEVATION ----
+  // ---- AREA LEGENDA ----
   let legendWidth = 250;
+  let legendX = spacing;
+  let legendY = yBase;
+
   push();
-  translate(spacing, yBase);
+  translate(legendX, legendY);
   fill(255);
   textSize(16);
   textAlign(LEFT, TOP);
@@ -198,7 +210,6 @@ function drawLegendAndCheckboxes(yBase) {
   textAlign(RIGHT);
   text("High", 10 + gradWidth, 60);
 
-  // Quadrato grigio "No data"
   fill(0, 0, 30);
   rect(10 + gradWidth + 20, 47.5, 15, 15, 3);
   fill(255);
@@ -206,32 +217,61 @@ function drawLegendAndCheckboxes(yBase) {
   text("No data", 10 + gradWidth + 40, 47.5);
   pop();
 
-  // ---- AREA CHECKBOX ----
-  let checkboxX = spacing + legendWidth + 50;
-  let checkboxY = yBase + 10;
+  // ---- CHECKBOX SU UN’UNICA RIGA ----
+  let startX = legendX + 10;
+  let checkboxY = yBase + 90;
+  let x = startX;
+
+  textSize(12);
+  textAlign(LEFT, CENTER);
+
   for (let cat of categories) {
-    // box esterno
-    fill(255);
-    rect(checkboxX, checkboxY + 6, 15, 15);
+    // quadrato checkbox
+    let boxSize = 16;
+    stroke(255);
+    strokeWeight(1.5);
+    fill(0, 0, 20);
+    rectMode(CORNER);
+    rect(x, checkboxY, boxSize, boxSize, 3);
 
-    // box interno colorato se attivo
-    if (checkboxes[cat]) fill(0, 200, 100);
-    else fill(100);
-    rect(checkboxX, checkboxY + 6, 12, 12);
-
-    // testo categoria
-    fill(255);
-    textAlign(LEFT, CENTER);
-    text(cat, checkboxX + 20, checkboxY + 6);
-
-    // gestione click
-    if (mouseIsPressed &&
-        mouseX > checkboxX - 7 && mouseX < checkboxX + 7 &&
-        mouseY > checkboxY - 1 && mouseY < checkboxY + 13) {
-      checkboxes[cat] = !checkboxes[cat];
+    // tick dentro al quadrato, centrato perfettamente
+    if (checkboxes[cat]) {
+      stroke(255);
+      strokeWeight(2);
+      noFill();
+      // disegna un ✓ stilizzato con due linee
+      line(x + 3, checkboxY + boxSize / 2, x + boxSize / 2 - 1, checkboxY + boxSize - 3);
+      line(x + boxSize / 2 - 1, checkboxY + boxSize - 3, x + boxSize - 3, checkboxY + 3);
     }
 
-    checkboxY += 25; // distanza verticale tra checkbox
+    // testo accanto
+    noStroke();
+    fill(255);
+    textAlign(LEFT, CENTER);
+    text(cat, x + boxSize + 8, checkboxY + boxSize / 2);
+
+    // aggiorna posizione orizzontale
+    x += textWidth(cat) + 60;
+  }
+}
+
+// Gestione click interattiva
+function mousePressed() {
+  let legendX = 20;
+  let checkboxY = height - 60;
+  let startX = legendX + 10;
+  let x = startX;
+  let boxSize = 16;
+  textSize(12);
+
+  for (let cat of categories) {
+    if (
+      mouseX > x && mouseX < x + boxSize &&
+      mouseY > checkboxY && mouseY < checkboxY + boxSize
+    ) {
+      checkboxes[cat] = !checkboxes[cat];
+    }
+    x += textWidth(cat) + 60;
   }
 }
 
